@@ -1,0 +1,7 @@
+[
+  { "id": "1", "title": "Hello World", "language": "JavaScript", "code": "function greet(name) {\n  return `Hello, ${name}!`\n}\n\nconsole.log(greet(\"World\"))" },
+  { "id": "2", "title": "Fetch Data", "language": "TypeScript", "code": "async function fetchData<T>(url: string): Promise<T> {\n  const res = await fetch(url)\n  if (!res.ok) throw new Error(res.statusText)\n  return res.json()\n}" },
+  { "id": "3", "title": "List Comprehension", "language": "Python", "code": "squares = [x ** 2 for x in range(10)]\neven = [x for x in squares if x % 2 == 0]\nprint(even)" },
+  { "id": "4", "title": "Main Method", "language": "Java", "code": "public class Main {\n  public static void main(String[] args) {\n    System.out.println(\"Hello, Java!\");\n  }\n}" },
+  { "id": "5", "title": "LINQ Query", "language": "C#", "code": "var evens = numbers\n  .Where(n => n % 2 == 0)\n  .OrderBy(n => n)\n  .ToList();" }
+]
