@@ -114,6 +114,7 @@ electron/
 
 - [High-Level Design](docs/HLD.md)
 - [Build Guide](docs/BUILD_GUIDE.md)
+- [GitHub Setup & Deployment](docs/GITHUB_SETUP.md)
 - [Architecture & Patterns](docs/ARCHITECTURE.md)
 - [Contributing](docs/CONTRIBUTING.md)
 - [Changelog](docs/CHANGELOG.md)
