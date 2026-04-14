@@ -125,3 +125,20 @@ interface Settings {
 - `nodeIntegration: false` — No Node.js in renderer
 - Preload script exposes only specific IPC channels via `contextBridge`
 - No remote code execution, no eval, no dynamic requires
+
+## 11. CI/CD & Distribution
+
+GitHub Actions automates cross-platform builds on a 3-OS matrix:
+
+```
+Push to main / Tag v* → GitHub Actions
+  ├── windows-latest → NSIS installer (.exe) + portable
+  ├── macos-latest   → DMG + ZIP
+  └── ubuntu-latest  → AppImage + .deb
+                       │
+                       ▼
+              GitHub Release (on tag push)
+              with all installers attached
+```
+
+Packaging is handled by `electron-builder` with targets configured in `package.json` under the `build` key.

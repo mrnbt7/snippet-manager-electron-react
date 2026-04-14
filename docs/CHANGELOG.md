@@ -28,3 +28,10 @@ All notable changes to Snippet Manager are documented here.
 - Cached language instances for performance
 - Single source of truth for default snippets (defaults.json)
 - Modular Electron main process (main, store, menu, ipc)
+
+### CI/CD
+- GitHub Actions workflow for automated cross-platform builds
+- 3-OS matrix: Windows (NSIS + portable), macOS (DMG + ZIP), Linux (AppImage + deb)
+- Automatic GitHub Release creation on tag push (`v*`)
+- Build artifacts uploaded for every push to `main`
+- electron-builder config in `package.json` with per-platform targets

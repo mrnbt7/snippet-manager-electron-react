@@ -74,6 +74,18 @@ npm run electron:build # Desktop distributable
 3. Update documentation if adding features
 4. Write a clear PR description explaining what and why
 5. Keep PRs focused — one feature or fix per PR
+6. CI will automatically build all 3 platforms — check the Actions tab for failures
+
+## Releasing
+
+Only maintainers can publish releases:
+
+```bash
+git tag v1.0.0
+git push origin v1.0.0
+```
+
+GitHub Actions will build Windows, macOS, and Linux installers and attach them to a GitHub Release.
 
 ## Reporting Issues
 

@@ -38,8 +38,32 @@ npm run dev
 ## 📦 Build for Distribution
 
 ```bash
+# Local build (current platform only)
 npm run electron:build
 ```
+
+Outputs installers to `release/`.
+
+## 🚢 Releases (CI/CD)
+
+Builds for all platforms are automated via GitHub Actions.
+
+| Platform | Artifacts |
+|----------|-----------|
+| Windows | `.exe` installer (NSIS) + portable `.exe` |
+| macOS | `.dmg` + `.zip` |
+| Linux | `.AppImage` + `.deb` |
+
+To publish a release:
+
+```bash
+git tag v1.0.0
+git push origin v1.0.0
+```
+
+GitHub Actions will build all three platforms and attach installers to the GitHub Release automatically.
+
+![Build Status](https://github.com/<owner>/<repo>/actions/workflows/build.yml/badge.svg)
 
 ## 🏗️ Architecture
 
@@ -105,6 +129,8 @@ electron/
 | State | Zustand 5 |
 | Editor | CodeMirror 6 |
 | Persistence | electron-store |
+| CI/CD | GitHub Actions |
+| Packaging | electron-builder |
 
 ## 📄 License
 
