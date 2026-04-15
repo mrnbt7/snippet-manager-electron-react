@@ -16,9 +16,7 @@ function seedDefaults(store) {
   store.set('snippets', defaults.map((s) => ({ ...s, createdAt: now, updatedAt: now })))
 }
 
-function getAllSnippets() {
-  return getSnippetStore().get('snippets', [])
-}
+function getAllSnippets() { return getSnippetStore().get('snippets', []) }
 
 function saveSnippet(snippet) {
   const store = getSnippetStore()
@@ -28,21 +26,18 @@ function saveSnippet(snippet) {
   store.set('snippets', snippets)
 }
 
+function saveAllSnippets(snippets) { getSnippetStore().set('snippets', snippets) }
+
 function removeSnippet(id) {
   const store = getSnippetStore()
   store.set('snippets', store.get('snippets', []).filter((s) => s.id !== id))
 }
 
-function getSettings() {
-  return settingsStore.store
-}
+function getAllFolders() { return getSnippetStore().get('folders', []) }
+function saveAllFolders(folders) { getSnippetStore().set('folders', folders) }
 
-function saveSettings(settings) {
-  settingsStore.set(settings)
-}
+function getSettings() { return settingsStore.store }
+function saveSettings(settings) { settingsStore.set(settings) }
+function getStoragePath(app) { return settingsStore.get('storagePath') || app.getPath('userData') }
 
-function getStoragePath(app) {
-  return settingsStore.get('storagePath') || app.getPath('userData')
-}
-
-module.exports = { seedDefaults, getSnippetStore, getAllSnippets, saveSnippet, removeSnippet, getSettings, saveSettings, getStoragePath }
+module.exports = { seedDefaults, getSnippetStore, getAllSnippets, saveSnippet, saveAllSnippets, removeSnippet, getAllFolders, saveAllFolders, getSettings, saveSettings, getStoragePath }

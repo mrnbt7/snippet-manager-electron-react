@@ -3,8 +3,15 @@ export interface Snippet {
   title: string
   language: string
   code: string
+  folderId: string | null
   createdAt: number
   updatedAt: number
+}
+
+export interface Folder {
+  id: string
+  name: string
+  order: number
 }
 
 export type Theme = 'dark' | 'light'
@@ -17,7 +24,13 @@ export interface Settings {
 export interface SnippetRepository {
   getAll: () => Promise<Snippet[]>
   save: (snippet: Snippet) => Promise<void>
+  saveAll: (snippets: Snippet[]) => Promise<void>
   remove: (id: string) => Promise<void>
+}
+
+export interface FolderRepository {
+  getAll: () => Promise<Folder[]>
+  saveAll: (folders: Folder[]) => Promise<void>
 }
 
 export interface SettingsRepository {
@@ -29,6 +42,9 @@ export interface SettingsRepository {
 
 export interface WindowService {
   resize: (width: number, height: number, hideMenu: boolean) => Promise<void>
+  dock: () => Promise<void>
+  undock: () => Promise<void>
+  dockResize: (width: number) => Promise<void>
 }
 
 export interface MenuService {

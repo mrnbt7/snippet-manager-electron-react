@@ -2,89 +2,143 @@
 
 ## 1. Overview
 
-Snippet Manager is a cross-platform desktop application for developers to store, organize, search, and drag-drop code snippets into external editors. Built with Electron, React, TypeScript, and CodeMirror.
+Snippet Manager is a cross-platform desktop application for developers to store, organize, and drag-drop code snippets into external editors. Built with Electron, React, TypeScript, and CodeMirror.
 
-## 2. Architecture
+## 2. System Architecture
 
-```
-┌─────────────────────────────────────────────────────┐
-│                   Electron Shell                     │
-│  ┌──────────────┐    IPC     ┌────────────────────┐ │
-│  │  Main Process │◄────────►│  Renderer Process    │ │
-│  │              │           │                      │ │
-│  │  main.cjs    │           │  React App (Vite)    │ │
-│  │  store.cjs   │           │  ┌────────────────┐  │ │
-│  │  menu.cjs    │           │  │  Components    │  │ │
-│  │  ipc.cjs     │           │  │  Stores        │  │ │
-│  │              │           │  │  Services      │  │ │
-│  └──────┬───────┘           │  │  Hooks         │  │ │
-│         │                   │  └────────────────┘  │ │
-│         ▼                   └──────────────────────┘ │
-│  ┌──────────────┐                                    │
-│  │ electron-store│ (JSON on disk)                    │
-│  └──────────────┘                                    │
-└─────────────────────────────────────────────────────┘
+```mermaid
+graph TB
+    subgraph Electron Shell
+        subgraph Main Process
+            M[main.cjs] --> S[store.cjs]
+            M --> MN[menu.cjs]
+            M --> I[ipc.cjs]
+            S --> ES[(electron-store<br/>JSON on disk)]
+        end
+        subgraph Renderer Process
+            R[React App] --> C[Components]
+            R --> ST[Zustand Stores]
+            R --> SV[Services]
+            R --> H[Hooks]
+        end
+        P[preload.cjs] -.IPC Bridge.- Main Process
+        P -.IPC Bridge.- Renderer Process
+    end
 ```
 
 ## 3. Component Architecture
 
-```
-App
-├── Sidebar
-│   ├── AddSnippetForm
-│   │   └── LanguageSelect
-│   ├── SnippetList (inline)
-│   └── CodeTooltip
-└── Editor
-    ├── LanguageSelect
-    └── CodeMirror
+```mermaid
+graph TD
+    App --> Sidebar
+    App --> Editor
+    App --> ResizeHandle
+    Sidebar --> SearchBox
+    Sidebar --> ActionBar
+    Sidebar --> AddSnippetForm
+    Sidebar --> FolderList
+    Sidebar --> SnippetList
+    Sidebar --> CodeTooltip
+    FolderList --> FolderHeader
+    FolderList --> SnippetItem
+    SnippetList --> SnippetItem
+    Editor --> LanguageSelect
+    Editor --> CodeMirror
+    AddSnippetForm --> LanguageSelect
 ```
 
 ## 4. Data Flow
 
-```
-User Action → Component → Zustand Store → Bridge Service → IPC → Electron Main → electron-store (disk)
-                                              │
-                                              └─► localStorage (browser fallback)
+```mermaid
+sequenceDiagram
+    participant U as User
+    participant C as Component
+    participant Z as Zustand Store
+    participant B as Bridge Service
+    participant I as IPC
+    participant E as electron-store
+
+    U->>C: Action (click, type, drag)
+    C->>Z: Call store action
+    Z->>B: Call repository method
+    B->>I: ipcRenderer.invoke()
+    I->>E: Read/write JSON
+    E-->>I: Data
+    I-->>B: Response
+    B-->>Z: Updated data
+    Z-->>C: Re-render
 ```
 
 ## 5. Layer Responsibilities
 
 | Layer | Location | Responsibility |
 |-------|----------|---------------|
-| Types | `src/types/` | Interfaces and contracts (Snippet, Settings, Repository, Service) |
-| Data | `src/data/` | Static default snippets (single source of truth) |
-| Services | `src/services/` | Bridge (Adapter pattern), Migration, Highlighter |
-| Store | `src/store/` | State management — snippetStore, settingsStore |
-| Hooks | `src/hooks/` | React hooks — useMenuEvents |
-| Components | `src/components/` | UI — Sidebar, Editor, AddSnippetForm, CodeTooltip, LanguageSelect |
-| Electron | `electron/` | Main process — main, store, menu, ipc, preload |
+| Types | `src/types/` | Interfaces: Snippet, Folder, Settings, Repository, Service |
+| Constants | `src/constants.ts` | Layout dimensions, shared config |
+| Data | `src/data/` | Default snippets (single source of truth) |
+| Services | `src/services/` | Bridge (Adapter), Migration, Highlighter |
+| Store | `src/store/` | State: snippetStore, settingsStore |
+| Hooks | `src/hooks/` | useMenuEvents |
+| Components | `src/components/` | UI: Sidebar, Editor, AddSnippetForm, CodeTooltip, LanguageSelect |
+| Icons | `src/components/icons/` | Shared SVG icon components |
+| Electron | `electron/` | main, store, menu, ipc, preload |
 
-## 6. Key Design Decisions
+## 6. Design Patterns
 
-### 6.1 Adapter Pattern (Bridge Service)
-The renderer never accesses `window.snippetAPI` directly. `services/bridge.ts` detects the environment and provides either Electron IPC or localStorage implementations behind the same interface. This enables:
-- Browser-mode development without Electron
-- Testability (mock the repository interface)
-- Swappable backends
+```mermaid
+graph LR
+    subgraph Adapter Pattern
+        A[bridge.ts] --> B{Electron?}
+        B -->|Yes| C[IPC Backend]
+        B -->|No| D[localStorage Backend]
+    end
+    subgraph Repository Pattern
+        E[SnippetRepository]
+        F[FolderRepository]
+        G[SettingsRepository]
+    end
+    subgraph Facade Pattern
+        H[main.cjs] --> I[store.cjs]
+        H --> J[menu.cjs]
+        H --> K[ipc.cjs]
+    end
+```
 
-### 6.2 Interface Segregation
-Instead of one monolithic API, we have focused interfaces:
-- `SnippetRepository` — CRUD for snippets
-- `SettingsRepository` — Theme and storage path
-- `WindowService` — Window resize
-- `MenuService` — Menu event subscriptions
+### Applied Patterns
+- **Adapter** — bridge.ts abstracts Electron IPC vs localStorage
+- **Repository** — SnippetRepository, FolderRepository, SettingsRepository
+- **Strategy** — Environment detection selects backend at startup
+- **Facade** — main.cjs orchestrates focused modules
+- **Factory** — cached() in languages.ts lazily creates LanguageSupport instances
+- **Observer** — Menu events via webContents.send → useMenuEvents hook
 
-### 6.3 Cached Language Instances
-CodeMirror language extensions are expensive to create. `languages.ts` uses a `cached()` helper that lazily creates and reuses `LanguageSupport` instances.
+## 7. SOLID Principles
 
-### 6.4 Sidebar-Only Mode
-The app supports collapsing to a narrow sidebar-only window. The Electron main process resizes the `BrowserWindow` and hides the menu bar via IPC.
+| Principle | Application |
+|-----------|-------------|
+| **S** — Single Responsibility | Each module has one job: snippetStore (state), bridge (adaptation), migration (data migration), highlighter (preview), etc. |
+| **O** — Open/Closed | Add a language: one line in languages.ts. Add an IPC channel: handler in ipc.cjs + method in bridge.ts. |
+| **L** — Liskov Substitution | Electron and localStorage backends are interchangeable behind repository interfaces. |
+| **I** — Interface Segregation | SnippetRepository, FolderRepository, SettingsRepository, WindowService, MenuService — each focused. |
+| **D** — Dependency Inversion | Components depend on interfaces, not implementations. bridge.ts provides concrete backends. |
 
-### 6.5 Drag & Drop
-Snippet list items use the HTML Drag and Drop API with `text/plain` data transfer, enabling drag-drop into VS Code, Visual Studio, Notepad++, and any text editor.
+## 8. Window State Machine
 
-## 7. Technology Stack
+```mermaid
+stateDiagram-v2
+    [*] --> Normal
+    Normal --> Collapsed: Collapse
+    Collapsed --> Normal: Expand
+    Normal --> DockCollapsed: Dock
+    Collapsed --> DockCollapsed: Dock
+    DockCollapsed --> DockExpanded: Expand icon
+    DockExpanded --> DockCollapsed: Collapse icon
+    DockCollapsed --> Normal: Undock
+    DockExpanded --> Normal: Undock
+    DockCollapsed --> [*]: Close
+```
+
+## 9. Technology Stack
 
 | Concern | Technology |
 |---------|-----------|
@@ -93,52 +147,57 @@ Snippet list items use the HTML Drag and Drop API with `text/plain` data transfe
 | Language | TypeScript 6 |
 | Bundler | Vite 8 |
 | State Management | Zustand 5 |
-| Code Editor | CodeMirror 6 (via @uiw/react-codemirror) |
-| Persistence | electron-store (Electron), localStorage (browser) |
+| Code Editor | CodeMirror 6 |
+| Persistence | electron-store / localStorage |
 | IDs | uuid |
+| CI/CD | GitHub Actions |
+| Packaging | electron-builder |
 
-## 8. Supported Languages
+## 10. Data Model
 
-C#, TypeScript, JavaScript, Java, Python, C++, SQL, Go, Rust, PHP
-
-## 9. Data Model
-
-```typescript
-interface Snippet {
-  id: string        // UUID
-  title: string
-  language: string  // Must match a key in LANGUAGES
-  code: string
-  createdAt: number // Unix timestamp
-  updatedAt: number
-}
-
-interface Settings {
-  theme: 'dark' | 'light'
-  storagePath: string  // Custom storage directory (empty = default)
-}
+```mermaid
+erDiagram
+    SNIPPET {
+        string id PK
+        string title
+        string language
+        string code
+        string folderId FK
+        number createdAt
+        number updatedAt
+    }
+    FOLDER {
+        string id PK
+        string name
+        number order
+    }
+    SETTINGS {
+        string theme
+        string storagePath
+    }
+    FOLDER ||--o{ SNIPPET : contains
 ```
 
-## 10. Security
+## 11. Security
 
-- `contextIsolation: true` — Renderer cannot access Node.js APIs directly
+- `contextIsolation: true` — Renderer cannot access Node.js APIs
 - `nodeIntegration: false` — No Node.js in renderer
-- Preload script exposes only specific IPC channels via `contextBridge`
-- No remote code execution, no eval, no dynamic requires
+- Preload exposes only specific IPC channels via contextBridge
+- No eval, no remote code execution, no dynamic requires
 
-## 11. CI/CD & Distribution
+## 12. CI/CD
 
-GitHub Actions automates cross-platform builds on a 3-OS matrix:
-
+```mermaid
+graph LR
+    A[Push to main] --> B[GitHub Actions]
+    A2[Tag v*] --> B
+    B --> C[Windows Build]
+    B --> D[macOS Build]
+    B --> E[Linux Build]
+    C --> F[.exe NSIS + portable]
+    D --> G[.dmg + .zip]
+    E --> H[.AppImage + .deb]
+    F --> I[GitHub Release]
+    G --> I
+    H --> I
 ```
-Push to main / Tag v* → GitHub Actions
-  ├── windows-latest → NSIS installer (.exe) + portable
-  ├── macos-latest   → DMG + ZIP
-  └── ubuntu-latest  → AppImage + .deb
-                       │
-                       ▼
-              GitHub Release (on tag push)
-              with all installers attached
-```
-
-Packaging is handled by `electron-builder` with targets configured in `package.json` under the `build` key.

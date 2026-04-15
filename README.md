@@ -15,9 +15,13 @@ Built with **Electron** + **React** + **TypeScript** + **CodeMirror**.
 
 - **10 Languages** — C#, TypeScript, JavaScript, Java, Python, C++, SQL, Go, Rust, PHP with full syntax highlighting
 - **Drag & Drop** — Drag any snippet directly into VS Code, Visual Studio, Notepad++, Sublime, or any text editor
-- **Sidebar-Only Mode** — Collapse to a compact sidebar window for quick access while coding
-- **Code Preview** — Hover over any snippet to see a tooltip preview of the code
+- **Folders** — Organize snippets into collapsible folders with drag-to-move
+- **Reorder** — Drag snippets to reorder within the sidebar
+- **Sidebar-Only Mode** — Collapse to a compact sidebar window for quick access
+- **Dock Mode** — Pin to the right edge of the screen as an always-on-top strip
+- **Code Preview** — Hover over any snippet to see a tooltip preview
 - **Dark / Light Theme** — Toggle via menu or `Ctrl+T`, persisted across sessions
+- **Resizable Sidebar** — Drag the border to resize
 - **Custom Storage** — Choose where your snippets JSON file is stored
 - **Search** — Filter snippets by title or language instantly
 - **Offline** — Everything runs locally, no internet required
@@ -82,11 +86,13 @@ Renderer (React + Zustand)  ──IPC──►  Main Process (Electron)
 ```
 src/
   components/    → UI (Sidebar, Editor, AddSnippetForm, CodeTooltip, LanguageSelect)
+  components/icons/ → Shared SVG icon components
   services/      → Business logic (bridge, migration, highlighter)
   store/         → State management (snippetStore, settingsStore)
   hooks/         → Custom hooks (useMenuEvents)
   types/         → TypeScript interfaces
   data/          → Default snippets (single source of truth)
+  constants.ts   → Layout dimensions
   languages.ts   → Language registry
 
 electron/
@@ -112,10 +118,12 @@ electron/
 
 ## 📖 Documentation
 
+- [User Guide](docs/USER_GUIDE.md)
 - [High-Level Design](docs/HLD.md)
 - [Build Guide](docs/BUILD_GUIDE.md)
 - [GitHub Setup & Deployment](docs/GITHUB_SETUP.md)
 - [Architecture & Patterns](docs/ARCHITECTURE.md)
+- [API Reference](docs/API_REFERENCE.md)
 - [Contributing](docs/CONTRIBUTING.md)
 - [Changelog](docs/CHANGELOG.md)
 
