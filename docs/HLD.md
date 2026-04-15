@@ -13,7 +13,7 @@ graph TB
             M[main.cjs] --> S[store.cjs]
             M --> MN[menu.cjs]
             M --> I[ipc.cjs]
-            S --> ES[(electron-store<br/>JSON on disk)]
+            S --> ES[(electron-store)]
         end
         subgraph Renderer Process
             R[React App] --> C[Components]
@@ -21,8 +21,8 @@ graph TB
             R --> SV[Services]
             R --> H[Hooks]
         end
-        P[preload.cjs] -.IPC Bridge.- Main Process
-        P -.IPC Bridge.- Renderer Process
+        P[preload.cjs] -->|IPC Bridge| M
+        P -->|IPC Bridge| R
     end
 ```
 
