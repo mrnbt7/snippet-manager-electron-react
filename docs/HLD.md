@@ -7,7 +7,12 @@ Snippet Manager is a cross-platform desktop application for developers to store,
 ## 2. System Architecture
 
 ```mermaid
-  info
+  graph TB
+    subgraph Electron Shell
+        subgraph Main Process
+end
+end
+end
 ```
 
 ```mermaid
