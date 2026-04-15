@@ -32,7 +32,7 @@
   },
   "build": {
     "appId": "com.snippetmanager.app",
-    "productName": "Snippet Manager",
+    "productName": "NBT Snippet Mgr",
     "directories": {
       "output": "release"
     },

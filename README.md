@@ -2,6 +2,7 @@
 
 A lightweight, cross-platform desktop app for developers to store, organize, and instantly drag-drop code snippets into any editor.
 
+![SnippetMgr](./docs/res/NBT-Snippet-Mgr.png)
 Built with **Electron** + **React** + **TypeScript** + **CodeMirror**.
 
 ![Electron](https://img.shields.io/badge/Electron-41-47848F?logo=electron&logoColor=white)
