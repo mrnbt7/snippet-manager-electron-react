@@ -29,7 +29,7 @@ function cached(factory: () => LanguageSupport): LangDef {
 const csInstance = StreamLanguage.define(csharp)
 
 export const LANGUAGES: Record<string, LangDef> = {
-  'C#':         { extension: () => csInstance, parser: () => csInstance.language.parser },
+  'C#':         { extension: () => csInstance, parser: () => (csInstance as unknown as LanguageSupport).language.parser },
   TypeScript:   cached(() => javascript({ typescript: true })),
   JavaScript:   cached(javascript),
   Java:         cached(java),

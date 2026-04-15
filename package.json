@@ -41,9 +41,9 @@
       "electron/**/*",
       "src/data/defaults.json"
     ],
+    "icon": "build/icon.png",
     "win": {
-      "target": ["nsis", "portable"],
-      "icon": "public/favicon.svg"
+      "target": ["nsis", "portable"]
     },
     "nsis": {
       "oneClick": false,

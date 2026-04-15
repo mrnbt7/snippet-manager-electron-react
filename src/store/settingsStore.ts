@@ -1,5 +1,5 @@
 import { create } from 'zustand'
-import type { Theme, Settings } from '../types/snippet'
+import type { Theme } from '../types/snippet'
 import { settingsRepo } from '../services/bridge'
 
 interface SettingsStore {

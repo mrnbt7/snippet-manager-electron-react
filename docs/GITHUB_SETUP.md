@@ -21,11 +21,11 @@ git init
 git add .
 git commit -m "Initial commit"
 git branch -M main
-git remote add origin https://github.com/<your-username>/snippet-manager-electron-react.git
+git remote add origin https://github.com/mrnbt7/snippet-manager-electron-react.git
 git push -u origin main
 ```
 
-> Replace `<your-username>` with your GitHub username.
+> Replace `mrnbt7` with your GitHub username.
 
 ## Step 3 — Verify GitHub Actions Runs
 
